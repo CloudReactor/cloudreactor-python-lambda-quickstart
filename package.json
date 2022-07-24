@@ -1,0 +1,18 @@
+{
+  "name": "cloudreactor-python-lambda-quickstart",
+  "version": "0.1.0",
+  "description": "Example of creating a function that runs as a cron job using the serverless `schedule` event",
+  "author": "jeff@cloudreactor.io",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "serverless-stack-output": "^0.2.3"
+  },
+  "main": "index.js",
+  "scripts": {
+    "sls": "serverless"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CloudReactor/cloudreactor-python-lambda-quickstart.git"
+  }
+}

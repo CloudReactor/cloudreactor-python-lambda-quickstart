@@ -1,0 +1,82 @@
+service: cloudreactor-python-lambda-quickstart
+
+frameworkVersion: '2 || 3'
+
+provider:
+  name: aws
+  runtime: python3.9
+  lambdaHashingVersion: 20201221
+  profile: ${self:custom.per_env.profile, 'default'}
+  vpc:
+    subnetIds:
+      - ${self:custom.per_env.subnet}
+    securityGroupIds:
+      - ${self:custom.per_env.security_group}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - secretsmanager:GetResourcePolicy
+        - secretsmanager:GetSecretValue
+        - secretsmanager:DescribeSecret
+        - secretsmanager:ListSecretVersionIds
+      Resource:
+        - "arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${sls:stage}/${self:service}/*"
+
+  memorySize: 1024
+  timeout: 600
+  environment:
+    DEPLOYMENT: ${sls:stage}
+    ROOT_LOG_LEVEL: DEBUG
+    PROC_WRAPPER_LOG_LEVEL: DEBUG
+    PROC_WRAPPER_TASK_VERSION_SIGNATURE: ${env:APP_TASK_VERSION_SIGNATURE}
+    PROC_WRAPPER_TASK_VERSION_NUMBER: "${file(./deploy_config/deploy_props.js):version_number}"
+    PROC_WRAPPER_CONFIG_LOCATIONS: "arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${sls:stage}/${self:service}/secrets.json"
+    APP_NAME: ${self:service}
+    APP_LOG_LEVEL: DEBUG
+    PROJECT_URL: "https://github.com/CloudReactor/cloudreactor-python-lambda-quickstart"
+
+custom:
+  common:
+    # Invoke Lambda function every day
+    rate_schedule: rate(1 day)
+
+    # Invoke Lambda function every 2nd hour from Mon-Fri
+    cron_schedule: cron(0 0/2 ? * MON-FRI *)
+
+  per_env: ${file(./deploy_config/serverless-config-${sls:stage}.yml)}
+
+functions:
+  rateHandler:
+    handler: handler.run_rate
+    events:
+      - schedule: ${self:custom.common.rate_schedule}
+    environment:
+      EXECUTION_SCHEDULE: ${self:custom.common.rate_schedule}
+  cronHandler:
+    handler: handler.run_cron
+    events:
+      - schedule: ${self:custom.common.cron_schedule}
+    environment:
+      EXECUTION_SCHEDULE: ${self:custom.common.cron_schedule}
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!package*.json'
+    - '!vscode/**'
+    - '!build/**'
+    - '!deploy_config/**'
+    - '!deploy.sh'
+    - '!terraform/**'
+    - '!README.md'
+    - '!config.localdev.json'
+
+#plugins:
+#  - serverless-python-requirements
+#  - serverless-stack-output
+
+# custom:
+#   output:
+#     handler: deploy_config/output.handler
+#     file: build/stack.yml
