@@ -72,8 +72,8 @@ package:
     - '!README.md'
     - '!config.localdev.json'
 
-#plugins:
-#  - serverless-python-requirements
+plugins:
+  - serverless-python-requirements
 #  - serverless-stack-output
 
 # custom:
