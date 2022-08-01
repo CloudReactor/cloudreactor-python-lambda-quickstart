@@ -12,36 +12,28 @@ LOCAL_DEVELOPMENT_RUN_ENVIRONMENT_NAME = 'localdev'
 
 def _run_internal(wrapper: ProcWrapper, cbdata: str,
         config: Mapping[str, Any]) -> str:
-
-    logger.info(config)
+    logger.debug(f"{config=}")
 
     rv = cbdata + ' -- SUCCESS!'
-
     wrapper.update_status(success_count=1, last_status_message=rv)
-
     return rv
-
-
-def detect_deployment():
-    return os.getenv('DEPLOYMENT') or LOCAL_DEVELOPMENT_RUN_ENVIRONMENT_NAME
 
 
 def make_proc_wrapper_params(task_name: str) -> ProcWrapperParams:
     proc_wrapper_params = ProcWrapperParams()
 
-    deployment = os.environ.get('DEPLOYMENT',
-        LOCAL_DEVELOPMENT_RUN_ENVIRONMENT_NAME)
+    deployment = os.getenv('DEPLOYMENT', LOCAL_DEVELOPMENT_RUN_ENVIRONMENT_NAME)
     proc_wrapper_params.deployment = deployment
 
     # For local development, read a local file, which should be filled in from
     # config.localdev.json.sample and copied to config.localdev.json
     #
     # When running with AWS Lambda, proc_wrapper will get its configuration
-    # locations from PROC_WRAPPER_CONFIG_LOCATIONS which is set by
-    # serverless.yml
+    # locations from the environment variable PROC_WRAPPER_CONFIG_LOCATIONS
+    # which is set by serverless.yml
     if deployment == LOCAL_DEVELOPMENT_RUN_ENVIRONMENT_NAME:
         proc_wrapper_params.config_locations = [
-            f"file://config.localdev.json",
+            "file://config.localdev.json",
         ]
 
     app_name = os.environ.get('APP_NAME', 'app')
@@ -50,7 +42,8 @@ def make_proc_wrapper_params(task_name: str) -> ProcWrapperParams:
     proc_wrapper_params.task_is_passive = False
     proc_wrapper_params.schedule = os.environ.get('EXECUTION_SCHEDULE', '')
     proc_wrapper_params.task_name = app_name + '_' + task_name + '_' + deployment
-    proc_wrapper_params.auto_create_task_run_environment_name = deployment
+    proc_wrapper_params.auto_create_task_run_environment_name = os.environ.get(
+        'PROC_WRAPPER_AUTO_CREATE_TASK_RUN_ENVIRONMENT_NAME', deployment)
     proc_wrapper_params.auto_create_task_props = {
         'project_url': os.environ.get('PROJECT_URL', '')
     }
@@ -67,7 +60,6 @@ def run(task_name: str, event: Any, context: Any) -> str:
     rv = wrapper.managed_call(_run_internal, data=task_name)
 
     current_time = datetime.datetime.now().time()
-
     logger.info(f"Your function {task_name} ran at {current_time}")
     logger.info(f"{rv=}")
 

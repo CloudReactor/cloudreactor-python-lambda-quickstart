@@ -34,7 +34,7 @@ provider:
     PROC_WRAPPER_CONFIG_LOCATIONS: "arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${sls:stage}/${self:service}/secrets.json"
     APP_NAME: ${self:service}
     APP_LOG_LEVEL: DEBUG
-    PROJECT_URL: "https://github.com/CloudReactor/cloudreactor-python-lambda-quickstart"
+    PROJECT_URL: "https://github.com/CloudReactor/${self:service}"
 
 custom:
   common:
@@ -45,6 +45,9 @@ custom:
     cron_schedule: cron(0 0/2 ? * MON-FRI *)
 
   per_env: ${file(./deploy_config/serverless-config-${sls:stage}.yml)}
+
+  pythonRequirements:
+    dockerizePip: true
 
 functions:
   rateHandler:
