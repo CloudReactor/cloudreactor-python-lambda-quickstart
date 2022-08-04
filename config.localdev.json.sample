@@ -1,0 +1,6 @@
+{
+  "proc_wrapper_params": {
+    "api_base_url": "https://api.cloudreactor.io",
+    "api_key": "YOUR_API_KEY"
+  }
+}

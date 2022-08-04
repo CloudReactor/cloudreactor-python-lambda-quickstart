@@ -11,138 +11,97 @@ authorName: 'Rupak Ganguly'
 authorAvatar: 'https://avatars0.githubusercontent.com/u/8188?v=4&s=140'
 -->
 
-# Serverless Framework Python Scheduled Cron on AWS
+# CloudReactor Python Lambda Quickstart
 
-This template demonstrates how to develop and deploy a simple cron-like service running on AWS Lambda using the traditional Serverless Framework.
+![Tests](https://github.com/CloudReactor/cloudreactor-python-lambda-quickstart/workflows/Tests/badge.svg?branch=master)
 
-## Schedule event type
+<img src="https://img.shields.io/github/license/CloudReactor/cloudreactor-python-lambda-quickstart.svg?style=flat-square" alt="License">
 
-This examples defines two functions, `rateHandler` and `cronHandler`, both of which are triggered by an event of `schedule` type, which is used for configuring functions to be executed at specific time or in specific intervals. For detailed information about `schedule` event, please refer to corresponding section of Serverless [docs](https://serverless.com/framework/docs/providers/aws/events/schedule/).
+This project serves as blueprint to get your python code
+running in [AWS Lambda](https://aws.amazon.com/lambda/),
+monitored and managed by
+[CloudReactor](https://www.cloudreactor.io/). See a
+[summary of the benefits](https://docs.cloudreactor.io/cloudreactor.html)
+of these technologies. This project is designed with best practices and smart
+defaults in mind, but also to be customizable.
 
-When defining `schedule` events, we need to use `rate` or `cron` expression syntax.
+It has these features built-in:
 
-### Rate expressions syntax
+* Sets up Tasks to be monitored and managed by CloudReactor
+* Reads secrets from AWS Secrets Manager
+* Uses [pip-tools](https://github.com/jazzband/pip-tools) to manage only
+top-level python library dependencies
+* Uses [pytest](https://docs.pytest.org/en/latest/) (automated tests),
+[pylint](https://www.pylint.org/) (static code analysis),
+[mypy](http://mypy-lang.org/) (static type checking), and
+[safety](https://github.com/pyupio/safety) (security vulnerability checking)
+for quality control
 
-```pseudo
-rate(value unit)
-```
+## Pre-requisites
 
-`value` - A positive number
+First, setup AWS and CloudReactor by following the
+[pre-requisites](https://docs.cloudreactor.io/full_integration.html#pre-requisites).
+You'll be granting CloudReactor permission to start Tasks on your behalf,
+creating API keys, and optionally creating an IAM user/role that has permission
+to deploy your Tasks.
 
-`unit` - The unit of time. ( minute | minutes | hour | hours | day | days )
+## Get this project's source code
 
-In below example, we use `rate` syntax to define `schedule` event that will trigger our `rateHandler` function every minute
+Next, you'll need to get this project's source code onto a filesystem where you
+can make changes. First
+[fork](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo)
+the project, then clone your project:
 
-```yml
-functions:
-  rateHandler:
-    handler: handler.run
-    events:
-      - schedule: rate(1 minute)
-```
+    git clone https://github.com/YourOrg/cloudreactor-python-lambda-quickstart.git
 
-Detailed information about rate expressions is available in official [AWS docs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#RateExpressions).
+## Requirements
 
+These tools are necessary for local development and deployment:
 
-### Cron expressions syntax
+* [pyenv](https://github.com/pyenv/pyenv) and
+[pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) are used for local
+python development
+* [pip-tools](https://github.com/jazzband/pip-tools) is used to compile
+top-level python library dependencies into requirements.txt files for python
+* [nvm](https://github.com/nvm-sh/nvm) is used to provide the NodeJS runtime
+used by serverless for deployment
 
-```pseudo
-cron(Minutes Hours Day-of-month Month Day-of-week Year)
-```
+## Development setup
 
-All fields are required and time zone is UTC only.
+After installing the required tools above, create the virtual environment:
 
-| Field         | Values         | Wildcards     |
-| ------------- |:--------------:|:-------------:|
-| Minutes       | 0-59           | , - * /       |
-| Hours         | 0-23           | , - * /       |
-| Day-of-month  | 1-31           | , - * ? / L W |
-| Month         | 1-12 or JAN-DEC| , - * /       |
-| Day-of-week   | 1-7 or SUN-SAT | , - * ? / L # |
-| Year          | 192199      | , - * /       |
+    pyenv virtualenv 3.9.12 cloudreactor-python-lambda-quickstart
+    pyenv activate cloudreactor-python-lambda-quickstart
+    python install -r requirements.txt
 
-In below example, we use `cron` syntax to define `schedule` event that will trigger our `cronHandler` function every second minute every Monday through Friday
+To run locally, first copy `config.localdev.json.sample` to
+`config.localdev.json` and update the API key value to one created in
+CloudReactor that has the Developer access level, either unscoped, or scoped
+to the Run Environment you want your Task to appear in.
 
-```yml
-functions:
-  cronHandler:
-    handler: handler.run
-    events:
-      - schedule: cron(0/2 * ? * MON-FRI *)
-```
+Before running, ensure you are using the correct virtualenv:
 
-Detailed information about cron expressions in available in official [AWS docs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions).
+    pyenv activate cloudreactor-python-lambda-quickstart
 
+Finally, to run:
 
-## Usage
+    python handler.py
 
-### Deployment
+## Deploying
 
-This example is made to work with the Serverless Framework dashboard, which includes advanced features such as CI/CD, monitoring, metrics, etc.
+If you don't have NodeJS 14.17.5 installed already in NVM:
 
-In order to deploy with dashboard, you need to first login with:
+    nvm install 14.17.5
 
-```
-serverless login
-```
+Then,
 
-and then perform deployment with:
-
-```
-serverless deploy
-```
-
-After running deploy, you should see output similar to:
-
-```bash
-Serverless: Packaging service...
-Serverless: Excluding development dependencies...
-Serverless: Uploading CloudFormation file to S3...
-Serverless: Uploading artifacts...
-Serverless: Uploading service aws-python-scheduled-cron.zip file to S3 (84.82 KB)...
-Serverless: Validating template...
-Serverless: Updating Stack...
-Serverless: Checking Stack update progress...
-........................
-Serverless: Stack update finished...
-Service Information
-service: aws-python-scheduled-cron
-stage: dev
-region: us-east-1
-stack: aws-python-scheduled-cron-dev
-resources: 16
-api keys:
-  None
-endpoints:
-  None
-functions:
-  rateHandler: aws-python-scheduled-cron-dev-rateHandler
-  cronHandler: aws-python-scheduled-cron-dev-cronHandler
-layers:
-  None
-Serverless: Publishing service to the Serverless Dashboard...
-Serverless: Successfully published your service to the Serverless Dashboard: https://app.serverless.com/xxxx/apps/xxxx/aws-python-scheduled-cron/dev/us-east-1
-```
-
-There is no additional step required. Your defined schedules becomes active right away after deployment.
-
-### Local invocation
-
-In order to test out your functions locally, you can invoke them with the following command:
-
-```
-serverless invoke local --function rateHandler
-```
-
-After invocation, you should see output similar to:
-
-```bash
-INFO:handler:Your cron function aws-python-scheduled-cron-dev-rateHandler ran at 15:02:43.203145
-```
+    ./deploy.sh <Run Environment name>
 
 ### Bundling dependencies
 
-In case you would like to include 3rd party dependencies, you will need to use a plugin called `serverless-python-requirements`. You can set it up by running the following command:
+This project uses
+[serverless-python-requirements]((https://github.com/UnitedIncome/serverless-python-requirements)
+to include python libraries.
 
 ```bash
 serverless plugin install -n serverless-python-requirements
@@ -151,8 +110,12 @@ serverless plugin install -n serverless-python-requirements
 Running the above will automatically add `serverless-python-requirements` to `plugins` section in your `serverless.yml` file and add it as a `devDependency` to `package.json` file. The `package.json` file will be automatically created if it doesn't exist beforehand. Now you will be able to add your dependencies to `requirements.txt` file (`Pipfile` and `pyproject.toml` is also supported but requires additional configuration) and they will be automatically injected to Lambda package during build process. For more details about the plugin's configuration, please refer to [official documentation](https://github.com/UnitedIncome/serverless-python-requirements).
 
 
-
 ## Installing Secrets
+
+This project is setup to read secrets from AWS Secrets Manager,
+using proc_wrapper.
+It is possible to populate Secrets Manager using Terraform,
+with the instructions below:
 
 Requirements:
 * Terraform (tested with version 1.2.5)
@@ -169,3 +132,6 @@ terraform workspace new dev
 terraform plan -out plan.out
 terraform apply plan.out
 
+Alternatively, you can populate the secrets manually in
+the AWS Console. The name of the secret should be `staging/cloudreactor-python-lambda-quickstart/secrets.json` where
+`staging` should be replaced with the Run Environment name.
