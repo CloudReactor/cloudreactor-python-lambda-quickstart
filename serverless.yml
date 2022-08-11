@@ -5,7 +5,6 @@ frameworkVersion: '2 || 3'
 provider:
   name: aws
   runtime: python3.9
-  lambdaHashingVersion: 20201221
   profile: ${self:custom.per_env.profile, 'default'}
   vpc:
     subnetIds:
@@ -13,15 +12,17 @@ provider:
     securityGroupIds:
       - ${self:custom.per_env.security_group}
 
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - secretsmanager:GetResourcePolicy
-        - secretsmanager:GetSecretValue
-        - secretsmanager:DescribeSecret
-        - secretsmanager:ListSecretVersionIds
-      Resource:
-        - "arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${sls:stage}/${self:service}/*"
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - secretsmanager:GetResourcePolicy
+            - secretsmanager:GetSecretValue
+            - secretsmanager:DescribeSecret
+            - secretsmanager:ListSecretVersionIds
+          Resource:
+            - "arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${sls:stage}/${self:service}/*"
 
   memorySize: 1024
   timeout: 600
@@ -47,7 +48,9 @@ custom:
   per_env: ${file(./deploy_config/serverless-config-${sls:stage}.yml)}
 
   pythonRequirements:
-    dockerizePip: true
+    dockerizePip: 'non-linux'
+    useDownloadCache: true
+    useStaticCache: false
 
 #   output:
 #     handler: deploy_config/output.handler
