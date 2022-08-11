@@ -49,15 +49,19 @@ custom:
   pythonRequirements:
     dockerizePip: true
 
+#   output:
+#     handler: deploy_config/output.handler
+#     file: build/stack.yml
+
 functions:
   rateHandler:
-    handler: handler.run_rate
+    handler: functions.handler.run_rate
     events:
       - schedule: ${self:custom.common.rate_schedule}
     environment:
       EXECUTION_SCHEDULE: ${self:custom.common.rate_schedule}
   cronHandler:
-    handler: handler.run_cron
+    handler: functions.handler.run_cron
     events:
       - schedule: ${self:custom.common.cron_schedule}
     environment:
@@ -78,8 +82,3 @@ package:
 plugins:
   - serverless-python-requirements
 #  - serverless-stack-output
-
-# custom:
-#   output:
-#     handler: deploy_config/output.handler
-#     file: build/stack.yml
