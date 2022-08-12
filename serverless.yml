@@ -14,6 +14,7 @@ provider:
 
   iam:
     role:
+      name: "${self:service}-${sls:stage}"
       statements:
         - Effect: Allow
           Action:
@@ -33,6 +34,7 @@ provider:
     PROC_WRAPPER_TASK_VERSION_SIGNATURE: ${env:APP_TASK_VERSION_SIGNATURE}
     PROC_WRAPPER_TASK_VERSION_NUMBER: "${file(./deploy_config/deploy_props.js):version_number}"
     PROC_WRAPPER_CONFIG_LOCATIONS: "arn:aws:secretsmanager:${aws:region}:${aws:accountId}:secret:${sls:stage}/${self:service}/secrets.json"
+    PROC_WRAPPER_AUTO_CREATE_TASK_RUN_ENVIRONMENT_NAME: ${self:custom.per_env.run_environment, sls:stage}
     APP_NAME: ${self:service}
     APP_LOG_LEVEL: DEBUG
     PROJECT_URL: "https://github.com/CloudReactor/${self:service}"
@@ -72,15 +74,19 @@ functions:
 
 package:
   patterns:
+    - '!.github/**'
+    - '!.nvmrc'
     - '!node_modules/**'
     - '!package*.json'
-    - '!vscode/**'
+    - '!.vscode/**'
     - '!build/**'
     - '!deploy_config/**'
     - '!deploy.sh'
     - '!terraform/**'
     - '!README.md'
-    - '!config.localdev.json'
+    - '!config.localdev.json*'
+    - '!LICENSE*'
+    - '!requirements*'
 
 plugins:
   - serverless-python-requirements

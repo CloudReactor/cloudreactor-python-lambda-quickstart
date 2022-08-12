@@ -5,7 +5,7 @@ import os
 
 from proc_wrapper import ProcWrapper, ProcWrapperParams
 
-from logger import logger
+from .logger import logger
 
 LOCAL_DEVELOPMENT_RUN_ENVIRONMENT_NAME = 'localdev'
 

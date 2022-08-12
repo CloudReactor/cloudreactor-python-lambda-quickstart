@@ -22,6 +22,6 @@ fi
 
 nvm install
 nvm exec npm install
-pyenv install --skip-existing
+pyenv install --skip-existing `cat .python-version`
 export APP_TASK_VERSION_SIGNATURE=`git rev-parse HEAD`
 nvm exec npm run sls -- deploy --stage=$DEPLOYMENT_ENVIRONMENT

@@ -85,7 +85,7 @@ Before running, ensure you are using the correct virtualenv:
 
 Finally, to run:
 
-    python handler.py
+    python -m functions.handler
 
 ## Deploying
 
@@ -103,12 +103,12 @@ This project uses
 [serverless-python-requirements]((https://github.com/UnitedIncome/serverless-python-requirements)
 to include python libraries.
 
-```bash
-serverless plugin install -n serverless-python-requirements
-```
+To build the `requirements.txt` file, the project uses
+[pip-tools](https://github.com/jazzband/pip-tools) so that we only have to
+manage top-level python library dependencies. To update the compiled
+`requirements.txt` file:
 
-Running the above will automatically add `serverless-python-requirements` to `plugins` section in your `serverless.yml` file and add it as a `devDependency` to `package.json` file. The `package.json` file will be automatically created if it doesn't exist beforehand. Now you will be able to add your dependencies to `requirements.txt` file (`Pipfile` and `pyproject.toml` is also supported but requires additional configuration) and they will be automatically injected to Lambda package during build process. For more details about the plugin's configuration, please refer to [official documentation](https://github.com/UnitedIncome/serverless-python-requirements).
-
+    pip-compile --allow-unsafe --generate-hashes --output-file=requirements.txt requirements.in
 
 ## Installing Secrets
 
@@ -126,7 +126,7 @@ and can be accessed the account used to run terraform.
 In the `terraform` directory:
 
 ```
-export AWS_PROFILE=us-east-1
+export AWS_PROFILE=<your AWS profile name>
 terraform init
 terraform workspace new dev
 terraform plan -out plan.out

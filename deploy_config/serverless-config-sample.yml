@@ -1,0 +1,6 @@
+# Rename this file serverless-config-[stage].yml
+profile: aws_profile_name
+deployment_bucket: example-serverless-deployments
+subnet: subnet-xxx
+security_group: sg-xxx
+run_environment: run_environment_name

@@ -10,4 +10,4 @@ build/
 !build/.keep
 
 config.localdev.json
-deploy_config/serverless-config-*.yml
+
