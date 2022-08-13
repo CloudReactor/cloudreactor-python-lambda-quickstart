@@ -76,6 +76,8 @@ package:
   patterns:
     - '!.github/**'
     - '!.nvmrc'
+    - '!.pylintrc'
+    - '!mypy.ini'
     - '!node_modules/**'
     - '!package*.json'
     - '!.vscode/**'
@@ -83,6 +85,7 @@ package:
     - '!deploy_config/**'
     - '!deploy.sh'
     - '!terraform/**'
+    - '!test/**'
     - '!README.md'
     - '!config.localdev.json*'
     - '!LICENSE*'

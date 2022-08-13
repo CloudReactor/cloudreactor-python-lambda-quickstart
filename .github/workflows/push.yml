@@ -30,7 +30,7 @@ jobs:
     - name: Type check with mypy
       run: "mypy -m functions"
     - name: Syntax check with pylint
-      run: "pylint --rcfile=src/.pylintrc functions || pylint-exit --error-fail $?"
+      run: "pylint --rcfile=.pylintrc functions || pylint-exit --error-fail $?"
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
