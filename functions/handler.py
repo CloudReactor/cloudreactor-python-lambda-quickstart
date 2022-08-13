@@ -10,13 +10,17 @@ from .logger import logger
 LOCAL_DEVELOPMENT_RUN_ENVIRONMENT_NAME = 'localdev'
 
 
+def make_result(x: str) -> str:
+    return x + ' -- SUCCESS!'
+
+
 def _run_internal(wrapper: ProcWrapper, cbdata: str,
         config: Mapping[str, Any]) -> str:
     logger.debug(f"{config=}")
 
-    rv = cbdata + ' -- SUCCESS!'
-    wrapper.update_status(success_count=1, last_status_message=rv)
-    return rv
+    result = make_result(cbdata)
+    wrapper.update_status(success_count=1, last_status_message=result)
+    return result
 
 
 def make_proc_wrapper_params(task_name: str) -> ProcWrapperParams:

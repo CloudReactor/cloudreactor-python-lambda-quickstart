@@ -18,7 +18,7 @@ authorAvatar: 'https://avatars0.githubusercontent.com/u/8188?v=4&s=140'
 <img src="https://img.shields.io/github/license/CloudReactor/cloudreactor-python-lambda-quickstart.svg?style=flat-square" alt="License">
 
 This project serves as blueprint to get your python code
-running in [AWS Lambda](https://aws.amazon.com/lambda/),
+running in [AWS Lambda](https://aws.amazon.com/lambda/), deployed by the [serverless](https://www.serverless.com/framework) framework, and
 monitored and managed by
 [CloudReactor](https://www.cloudreactor.io/). See a
 [summary of the benefits](https://docs.cloudreactor.io/cloudreactor.html)
@@ -70,9 +70,9 @@ used by serverless for deployment
 
 After installing the required tools above, create the virtual environment:
 
-    pyenv virtualenv 3.9.12 cloudreactor-python-lambda-quickstart
-    pyenv activate cloudreactor-python-lambda-quickstart
-    python install -r requirements.txt
+    pyenv virtualenv 3.9.13 cloudreactor-python-lambda-quickstart-dev
+    pyenv activate cloudreactor-python-lambda-quickstart-dev
+    python install -r requirements.txt -r dev-requirements.txt
 
 To run locally, first copy `config.localdev.json.sample` to
 `config.localdev.json` and update the API key value to one created in
@@ -81,11 +81,20 @@ to the Run Environment you want your Task to appear in.
 
 Before running, ensure you are using the correct virtualenv:
 
-    pyenv activate cloudreactor-python-lambda-quickstart
+    pyenv activate cloudreactor-python-lambda-quickstart-dev
 
 Finally, to run:
 
     python -m functions.handler
+
+To run type-checking with mypy:
+
+    mypy -m functions
+
+To run source-code static analysis:
+
+    pylint functions
+
 
 ## Deploying
 
@@ -100,12 +109,12 @@ Then,
 ### Bundling dependencies
 
 This project uses
-[serverless-python-requirements]((https://github.com/UnitedIncome/serverless-python-requirements)
+[serverless-python-requirements](https://github.com/UnitedIncome/serverless-python-requirements)
 to include python libraries.
 
 To build the `requirements.txt` file, the project uses
 [pip-tools](https://github.com/jazzband/pip-tools) so that we only have to
-manage top-level python library dependencies. To update the compiled
+manage top-level python library dependencies in `requirements.in`. To update the compiled
 `requirements.txt` file:
 
     pip-compile --allow-unsafe --generate-hashes --output-file=requirements.txt requirements.in
@@ -131,6 +140,7 @@ terraform init
 terraform workspace new dev
 terraform plan -out plan.out
 terraform apply plan.out
+```
 
 Alternatively, you can populate the secrets manually in
 the AWS Console. The name of the secret should be `staging/cloudreactor-python-lambda-quickstart/secrets.json` where
