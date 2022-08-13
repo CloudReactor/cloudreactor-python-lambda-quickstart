@@ -1,14 +1,14 @@
 <!--
-title: 'AWS Python Scheduled Cron example in Python'
-description: 'This is an example of creating a function that runs as a cron job using the serverless ''schedule'' event.'
+title: 'AWS Python Scheduled Cron example monitored by CloudReactor'
+description: 'This is an example of creating a function that runs as a cron job using the serverless ''schedule'' event, and monitored and managed by CloudReactor.'
 layout: Doc
 framework: v1
 platform: AWS
 language: Python
 priority: 2
-authorLink: 'https://github.com/rupakg'
-authorName: 'Rupak Ganguly'
-authorAvatar: 'https://avatars0.githubusercontent.com/u/8188?v=4&s=140'
+authorLink: 'https://github.com/CloudReactor'
+authorName: 'Jeff Tsay'
+authorAvatar: 'https://avatars.githubusercontent.com/u/1079646?v=4&s=140'
 -->
 
 # CloudReactor Python Lambda Quickstart
@@ -95,8 +95,11 @@ To run source-code static analysis:
 
     pylint functions
 
+To check for security vulnerabilities in the python libraries:
 
-## Deploying
+    safety check
+
+## Deploying locally
 
 If you don't have NodeJS 14.17.5 installed already in NVM:
 
@@ -106,6 +109,20 @@ Then,
 
     ./deploy.sh <Run Environment name>
 
+## Deploying with GitHub Action
+
+This project is setup to deploy with a GitHub Action when a commit is pushed to
+the master branch. It requires these GitHub secrets to be set:
+
+* AWS_ACCESS_KEY_ID
+* AWS_SECRET_ACCESS_KEY
+* AWS_REGION
+* SERVERLESS_CONFIG_YAML - set to YAML text, use a modified version of
+`deploy_config/serverless-config-sample.yml`, with `profile` set to `null`
+
+See serverless's [guide to setting up access keys](https://www.serverless.com/framework/docs/providers/aws/guide/credentials#create-an-iam-user-and-access-key)
+to be used for deployment.
+
 ### Bundling dependencies
 
 This project uses
@@ -114,10 +131,19 @@ to include python libraries.
 
 To build the `requirements.txt` file, the project uses
 [pip-tools](https://github.com/jazzband/pip-tools) so that we only have to
-manage top-level python library dependencies in `requirements.in`. To update the compiled
-`requirements.txt` file:
+manage top-level python library dependencies in `requirements.in`. To update the
+compiled `requirements.txt` file:
 
     pip-compile --allow-unsafe --generate-hashes --output-file=requirements.txt requirements.in
+
+The development environment has additional dependencies found in
+`dev-requirements.in`. To update the copiled `dev-requirements.txt` file:
+
+    pip-compile --allow-unsafe --generate-hashes --output-file=dev-requirements.txt dev-requirements.in
+
+Then to install the libraries:
+
+    pip install -r requirements.txt -r dev-requirements.txt
 
 ## Installing Secrets
 
@@ -144,4 +170,4 @@ terraform apply plan.out
 
 Alternatively, you can populate the secrets manually in
 the AWS Console. The name of the secret should be `staging/cloudreactor-python-lambda-quickstart/secrets.json` where
-`staging` should be replaced with the Run Environment name.
+`staging` should be replaced with the stage name.
