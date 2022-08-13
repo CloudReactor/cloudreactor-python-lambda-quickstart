@@ -1,0 +1,59 @@
+name: Check and Deploy
+on:
+  push:
+    branches: [ "**" ]
+    paths-ignore:
+      - '*.md'
+      - 'terraform/**'
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Set to 'true' to deploy to AWS Lambda"
+        required: false
+        default: "true"
+
+jobs:
+  check_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt -r dev-requirements.txt
+        pip install pylint-exit
+    - name: Test with pytest
+      run: "pytest functions"
+    - name: Type check with mypy
+      run: "mypy -m functions"
+    - name: Syntax check with pylint
+      run: "pylint --rcfile=src/.pylintrc functions || pylint-exit --error-fail $?"
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: "14.17.5"
+    - name: Output secrets
+      run: |
+          echo "$SERVERLESS_CONFIG_YAML" >> deploy_config/serverless-config-staging.yml
+      shell: bash
+      env:
+        SERVERLESS_CONFIG_YAML: ${{ secrets.SERVERLESS_CONFIG_YAML }}
+      if: (github.ref == 'refs/heads/master') || (github.event.inputs.deploy == 'true')
+    - run: npm ci --also=dev
+      if: (github.ref == 'refs/heads/master') || (github.event.inputs.deploy == 'true')
+    - name: serverless deploy
+      run: "npm run sls -- deploy --stage=staging --verbose"
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+      if: (github.ref == 'refs/heads/master') || (github.event.inputs.deploy == 'true')
+    - name: Remove secrets
+      run: "rm deploy_config/serverless-config-staging.yml"
+      if: (github.ref == 'refs/heads/master') || (github.event.inputs.deploy == 'true')
+    - name: Print final message
+      run: "echo Complete!"
