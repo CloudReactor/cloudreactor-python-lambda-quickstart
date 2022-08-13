@@ -1,4 +1,7 @@
 # Rename this file serverless-config-[stage].yml
+
+# Use the null value for setting SERVERLESS_CONFIG_YAML in GitHub secrets,
+# for use in the GitHub Action that deploys this project.
 profile: aws_profile_name
 deployment_bucket: example-serverless-deployments
 subnet: subnet-xxx
