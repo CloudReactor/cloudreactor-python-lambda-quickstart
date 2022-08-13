@@ -5,7 +5,7 @@ frameworkVersion: '2 || 3'
 provider:
   name: aws
   runtime: python3.9
-  profile: ${self:custom.per_env.profile, 'default'}
+  profile: ${self:custom.per_env.profile}
   vpc:
     subnetIds:
       - ${self:custom.per_env.subnet}
