@@ -1,8 +1,15 @@
+#!/usr/local/bin/python
+
+"""
+Creates a configured logger instance, suitable for running in AWS Lambda.
+"""
+
 import logging
 import os
 
 root_log_level = getattr(logging, os.environ.get('ROOT_LOG_LEVEL') or 'DEBUG')
 
+# pylint: disable=invalid-name
 log_format = '%(levelname)s: %(name)s - %(message)s'
 
 # AWS Lambda adds the timestamp to all logs

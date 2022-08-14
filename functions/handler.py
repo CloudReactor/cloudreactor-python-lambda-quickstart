@@ -1,3 +1,9 @@
+#!/usr/local/bin/python
+
+"""
+An example function that shows how to use proc_wrapper's embedded mode.
+"""
+
 from typing import Any, Mapping
 
 import datetime
@@ -10,8 +16,9 @@ from .logger import logger
 LOCAL_DEVELOPMENT_RUN_ENVIRONMENT_NAME = 'localdev'
 
 
-def make_result(x: str) -> str:
-    return x + ' -- SUCCESS!'
+def make_result(value: str) -> str:
+    """ A simple testable function that concatenates a string. """
+    return value + ' -- SUCCESS!'
 
 
 def _run_internal(wrapper: ProcWrapper, cbdata: str,
@@ -24,6 +31,7 @@ def _run_internal(wrapper: ProcWrapper, cbdata: str,
 
 
 def make_proc_wrapper_params(task_name: str) -> ProcWrapperParams:
+    """ Create a configured instance of proc_wrapper_params. """
     proc_wrapper_params = ProcWrapperParams()
 
     deployment = os.getenv('DEPLOYMENT', LOCAL_DEVELOPMENT_RUN_ENVIRONMENT_NAME)
@@ -55,26 +63,32 @@ def make_proc_wrapper_params(task_name: str) -> ProcWrapperParams:
     return proc_wrapper_params
 
 def run(task_name: str, event: Any, context: Any) -> str:
+    """
+    Helper function that configures proc_wrapper before running the
+    main code.
+    """
     logger.info(f"Received {event=}")
 
     proc_wrapper_params = make_proc_wrapper_params(task_name=task_name)
     wrapper = ProcWrapper(params=proc_wrapper_params,
         runtime_context=context, input_value=event)
 
-    rv = wrapper.managed_call(_run_internal, data=task_name)
+    result = wrapper.managed_call(_run_internal, data=task_name)
 
     current_time = datetime.datetime.now().time()
-    logger.info(f"Your function {task_name} ran at {current_time}")
-    logger.info(f"{rv=}")
+    logger.info("Your function %s ran at %s", task_name, current_time)
+    logger.info(f"{result=}")
 
-    return rv
+    return result
 
 
 def run_rate(event: Any, context: Any) -> str:
+    """ Entrypoint from AWS Lambda, for the function run at a fixed rate. """
     return run(task_name="rate", event=event, context=context)
 
 
 def run_cron(event: Any, context: Any) -> str:
+    """ Entrypoint from AWS Lambda, for the function run on a cron schedule. """
     return run(task_name="cron", event=event, context=context)
 
 
