@@ -24,3 +24,9 @@ logging.basicConfig(level=root_log_level,
 
 logger = logging.getLogger(os.environ.get('APP_NAME') or 'APP')
 logger.setLevel(os.environ.get('APP_LOG_LEVEL') or 'DEBUG')
+
+# botocore logs secrets retrieved from Secrets Manager when the log level is
+# DEBUG or lower, so set the log level to INFO to avoid that.
+if root_log_level <= logging.DEBUG:
+    logging.getLogger('botocore').setLevel(logging.INFO)
+

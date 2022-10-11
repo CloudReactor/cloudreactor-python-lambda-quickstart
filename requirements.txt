@@ -4,9 +4,9 @@
 #
 #    pip-compile --allow-unsafe --generate-hashes --output-file=requirements.txt requirements.in
 #
-cloudreactor-procwrapper==5.0.0 \
-    --hash=sha256:d52167031a6624df69b16cc31ba4433465e71d30fc34265cd74321f96584b628 \
-    --hash=sha256:efdd53e56e27058d5a1ce083cb65d00b3f662ecf3abe28b032c67d6bef959455
+cloudreactor-procwrapper==5.0.2 \
+    --hash=sha256:51c4d56cef0e30708c0bb05cd556984dfd662bfa2e76a7af0a90bcc540b7161d \
+    --hash=sha256:d3bc50b71d26c294a83b3210308876e65d274e39b834650a17dcab69648fd33b
     # via -r requirements.in
 decorator==5.1.1 \
     --hash=sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330 \

@@ -1,4 +1,4 @@
-cloudreactor-procwrapper==5.0.0
+cloudreactor-procwrapper==5.0.2
 
 # Requirements for secrets resolution
 # Note that boto3 is already included in the AWS Lambda python environment,
