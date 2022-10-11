@@ -29,4 +29,3 @@ logger.setLevel(os.environ.get('APP_LOG_LEVEL') or 'DEBUG')
 # DEBUG or lower, so set the log level to INFO to avoid that.
 if root_log_level <= logging.DEBUG:
     logging.getLogger('botocore').setLevel(logging.INFO)
-
