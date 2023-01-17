@@ -164,7 +164,7 @@ In the `terraform` directory:
 export AWS_PROFILE=<your AWS profile name>
 export AWS_REGION=<AWS region in which your function will execute>
 terraform init
-terraform workspace new dev
+terraform workspace new <stage>
 terraform plan -out plan.out
 terraform apply plan.out
 ```
