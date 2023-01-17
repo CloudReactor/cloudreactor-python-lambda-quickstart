@@ -34,7 +34,7 @@ top-level python library dependencies
 * Uses [pytest](https://docs.pytest.org/en/latest/) (automated tests),
 [pylint](https://www.pylint.org/) (static code analysis),
 [mypy](http://mypy-lang.org/) (static type checking), and
-[safety](https://github.com/pyupio/safety) (security vulnerability checking)
+[pip-audit](https://github.com/pypa/pip-audit) (security vulnerability checking)
 for quality control
 
 ## Pre-requisites
@@ -97,7 +97,7 @@ To run source-code static analysis:
 
 To check for security vulnerabilities in the python libraries:
 
-    safety check
+    python -m pip_audit -r requirements.txt
 
 ## Deploying locally
 
